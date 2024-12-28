@@ -3,7 +3,12 @@
 <div class="row">
   <h1 class="text-center">Editing Campground</h1>
   <div class="col-6 offset-3">
-    <form action="/campgrounds/<%= campground._id %>?_method=PUT" method="POST">
+    <form
+      action="/campgrounds/<%= campground._id %>?_method=PUT"
+      method="POST"
+      novalidate
+      class="validated-form"
+    >
       <div class="mb-3">
         <label for="title" class="form-label">Title</label>
         <input
@@ -12,7 +17,9 @@
           id="title"
           name="campgrounds[title]"
           value="<%= campground.title %>"
+          required
         />
+        <div class="valid-feedback">Right format</div>
       </div>
       <div class="mb-3">
         <label for="location" class="form-label">Location</label>
@@ -22,7 +29,9 @@
           id="location"
           name="campgrounds[location]"
           value="<%= campground.location %>"
+          required
         />
+        <div class="valid-feedback">Right format</div>
       </div>
       <div class="mb-3">
         <label for="image" class="form-label">Image URL</label>
@@ -32,7 +41,9 @@
           id="image"
           name="campgrounds[image]"
           value="<%= campground.image %>"
+          required
         />
+        <div class="valid-feedback">Right format</div>
       </div>
       <div class="mb-3">
         <label for="price" class="form-label">Price</label>
@@ -47,7 +58,9 @@
             aria-label="price"
             aria-describedby="price-label"
             name="campgrounds[price]"
+            required
           />
+          <div class="valid-feedback">Right format</div>
         </div>
       </div>
       <div class="mb-3">
@@ -57,9 +70,11 @@
           class="form-control"
           id="description"
           name="campgrounds[description]"
+          required
         >
 <%= campground.description %></textarea
         >
+        <div class="valid-feedback">Right format</div>
       </div>
       <div class="mb-3">
         <button class="btn btn-success">Edit Campground</button>
