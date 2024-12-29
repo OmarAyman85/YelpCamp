@@ -5,11 +5,15 @@ const path = require("path");
 const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStrategy = require("passport-local");
 //-----------------------------------------------------------------------------
 const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
-const campgrounds = require("./routes/campgrounds");
-const reviews = require("./routes/reviews");
+const campgroundsRoutes = require("./routes/campgrounds");
+const reviewsRoutes = require("./routes/reviews");
+const userRoutes = require("./routes/user");
+const User = require("./models/user");
 //-----------------------------------------------------------------------------
 dotenv.config();
 const PORT = process.env.PORT || 5001;
@@ -49,14 +53,22 @@ app.use(session(sessionConfig));
 //-----------------------------------------------------------------------------
 app.use(flash());
 //-----------------------------------------------------------------------------
+app.use(passport.initialize());
+app.use(passport.session());
+//-----------------------------------------------------------------------------
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+//-----------------------------------------------------------------------------
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();
 });
 //-----------------------------------------------------------------------------
-app.use("/campgrounds", campgrounds);
-app.use("/campgrounds/:id/reviews", reviews);
+app.use("/", userRoutes);
+app.use("/campgrounds", campgroundsRoutes);
+app.use("/campgrounds/:id/reviews", reviewsRoutes);
 //-----------------------------------------------------------------------------
 // General request
 app.get("/", (req, res) => {
