@@ -3,6 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const ejsMate = require("ejs-mate");
+const session = require("express-session");
+const flash = require("connect-flash");
+//-----------------------------------------------------------------------------
 const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
 const campgrounds = require("./routes/campgrounds");
@@ -31,6 +34,26 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 //-----------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, "public")));
+//-----------------------------------------------------------------------------
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7, //------------------milliseconds*seconds*minutes*hours*days = one week-----
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
+app.use(session(sessionConfig));
+//-----------------------------------------------------------------------------
+app.use(flash());
+//-----------------------------------------------------------------------------
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 //-----------------------------------------------------------------------------
 app.use("/campgrounds", campgrounds);
 app.use("/campgrounds/:id/reviews", reviews);
