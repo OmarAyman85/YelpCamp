@@ -3,11 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const ejsMate = require("ejs-mate");
-const { campgroundsSchema } = require("./schemas");
+const { campgroundsSchema, reviewSchema } = require("./schemas");
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
 const methodOverride = require("method-override");
 const Campground = require("./models/campground");
+const Review = require("./models/review");
 //-----------------------------------------------------------------------------
 dotenv.config();
 const PORT = process.env.PORT || 5001;
@@ -33,6 +34,16 @@ app.use(methodOverride("_method"));
 //-----------------------------------------------------------------------------
 const validateCampground = (req, res, next) => {
   const { error } = campgroundsSchema.validate(req.body, { abortEarly: false }); // abortEarly: false ensures all errors are returned
+  if (error) {
+    const msg = error.details.map((el) => el.message).join(",");
+    throw new ExpressError(msg, 400);
+  } else {
+    next();
+  }
+};
+
+const validateReview = (req, res, next) => {
+  const { error } = reviewSchema.validate(req.body, { abortEarly: false }); // abortEarly: false ensures all errors are returned
   if (error) {
     const msg = error.details.map((el) => el.message).join(",");
     throw new ExpressError(msg, 400);
@@ -75,7 +86,9 @@ app.post(
 app.get(
   "/campgrounds/:id",
   catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
+    const campground = await Campground.findById(req.params.id).populate(
+      "reviews"
+    );
     res.render("campgrounds/show", { campground });
   })
 );
@@ -100,12 +113,37 @@ app.put(
   })
 );
 //-----------------------------------------------------------------------------
-// Deleting an existing campground
+// Deleting a campground
 app.delete(
   "/campgrounds/:id",
   catchAsync(async (req, res) => {
     await Campground.findByIdAndDelete(req.params.id);
     res.redirect("/campgrounds");
+  })
+);
+//-----------------------------------------------------------------------------
+// Creating new review after submitting the form
+app.post(
+  "/campgrounds/:id/reviews",
+  validateReview,
+  catchAsync(async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+  })
+);
+//-----------------------------------------------------------------------------
+// Deleting a review
+app.delete(
+  "/campgrounds/:id/reviews/:reviewId",
+  catchAsync(async (req, res) => {
+    const { id, reviewId } = req.params;
+    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/campgrounds/${id}`);
   })
 );
 //-----------------------------------------------------------------------------

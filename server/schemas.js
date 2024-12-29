@@ -13,3 +13,14 @@ module.exports.campgroundsSchema = joi
       .required(),
   })
   .required();
+
+module.exports.reviewSchema = joi
+  .object({
+    review: joi
+      .object({
+        body: joi.string().required(),
+        rating: joi.number().required(),
+      })
+      .required(),
+  })
+  .required();

@@ -1,7 +1,8 @@
 <% layout('layouts/boilerplate') %>
 
 <div class="row">
-  <div class="col-10 offset-1">
+  <!-- ------------------------------------------------------------------------------------------- -->
+  <div class="col-8">
     <div class="card">
       <img src="<%= campground.image %> class="card-img-top" alt="..." />
       <div class="card-body">
@@ -28,7 +29,58 @@
       </div>
     </div>
   </div>
+  <!-- ------------------------------------------------------------------------------------------- -->
+  <div class="col-4">
+    <br />
+    <h2>Leave a review</h2>
+    <form
+      action="/campgrounds/<%= campground._id %>/reviews"
+      method="POST"
+      novalidate
+      class="mb-3 validated-form"
+    >
+      <div class="mb-3">
+        <label class="form-label" for="rating">Rating:</label>
+        <input
+          type="range"
+          min="0"
+          max="5"
+          id="rating"
+          name="review[rating]"
+          class="form-range"
+        />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="body">Review:</label>
+        <textarea
+          class="form-control"
+          name="review[body]"
+          id="body"
+          required
+        ></textarea>
+        <div class="valid-feedback">Right !!!</div>
+      </div>
+      <button class="btn btn-success">Submit</button>
+    </form>
+    <% for(let review of campground.reviews) { %>
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="mb-3">
+          <h5 class="card-title">Rating: <%= review.rating %></h5>
+          <p class="card-text">Review: <%= review.body %></p>
+          <form
+            action="/campgrounds/<%= campground._id %>/reviews/<%= review._id %>?_method=DELETE"
+            method="POST"
+          >
+            <button class="btn btn-sm btn-danger">DELETE</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <% } %>
+  </div>
 </div>
+<!-- ------------------------------------------------------------------------------------------- -->
 <hr />
 <div class="mb-5">
   <a href="/campgrounds">Return to all campgrounds</a>
