@@ -18,20 +18,14 @@ router.get("/new", isLoggedIn, campgroundsC.renderNewForm);
 //-----------------------------------------------------------------------------
 router
   .route("/:id")
-  .get("/:id", catchAsync(campgroundsC.showCampground))
+  .get(catchAsync(campgroundsC.showCampground))
   .put(
-    "/:id",
     isLoggedIn,
     isAuthor,
     validateCampground,
     catchAsync(campgroundsC.editCampground)
   )
-  .delete(
-    "/:id",
-    isLoggedIn,
-    isAuthor,
-    catchAsync(campgroundsC.deleteCampground)
-  );
+  .delete(isLoggedIn, isAuthor, catchAsync(campgroundsC.deleteCampground));
 //-----------------------------------------------------------------------------
 router.get(
   "/:id/edit",
