@@ -1,6 +1,6 @@
 const { campgroundsSchema, reviewSchema } = require("./schemas");
 const Campground = require("./models/campground");
-const Review = require("../models/review");
+const Review = require("./models/review");
 const ExpressError = require("./utils/ExpressError");
 //-----------------------------------------------------------------------------
 module.exports.validateCampground = (req, res, next) => {
