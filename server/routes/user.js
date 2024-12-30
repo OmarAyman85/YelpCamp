@@ -4,11 +4,12 @@ const usersC = require("../controllers/users");
 //-----------------------------------------------------------------------------
 const router = express.Router();
 //-----------------------------------------------------------------------------
-router.get("/register", usersC.renderNewUserForm);
-router.post("/register", catchAsync(usersC.createUser));
+router
+  .route("/register")
+  .get(usersC.renderNewUserForm)
+  .post(catchAsync(usersC.createUser));
 //-----------------------------------------------------------------------------
-router.get("/login", usersC.renderLoginForm);
-router.post("/login", usersC.login);
+router.route("/login").get(usersC.renderLoginForm).post(usersC.login);
 //-----------------------------------------------------------------------------
 router.get("/logout", catchAsync(usersC.logout));
 //-----------------------------------------------------------------------------
